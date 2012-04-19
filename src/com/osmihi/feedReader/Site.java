@@ -39,16 +39,14 @@ public class Site {
 			if (!verifyFeed()) {throw new MalformedURLException();}
 			
 		} catch (MalformedURLException e) {
-			while (att < MAX_SEARCHES && ( att == 0 ||  !verifyFeed() ) ) {
-				try {
-					System.out.println("Trying " + findUrl(m,att) + "...(" + att + ")");
-					mainUrl = new URL(findUrl(m,att));
-				} catch (MalformedURLException e2) {
-					throw new FeedNotFoundException();
-				}
-				findFeed();
-				att++;
+			try {
+				System.out.println("Trying " + findUrl(m));
+				mainUrl = new URL(findUrl(m));
+			} catch (MalformedURLException e2) {
+				throw new FeedNotFoundException();
 			}
+			findFeed();
+			att++;
 		}
 		
 		if (verifyFeed()) {
@@ -101,15 +99,19 @@ public class Site {
 		}  
 	}
 	
-	private String findUrl(String m, int attempt) {
+	private String findUrl(String m) {
+		//Since using the duckduckgo api only allows 1 search result, the 'attempt' argument isn't needed
+		//TODO Find new api for full search results
 		String newM = "";
 		String newUrlStr = "";
 		
 		try {
 			newM = java.net.URLEncoder.encode(m, "UTF-8");
 		} catch (UnsupportedEncodingException e) {}
-		String searchUrl = "http://api.search.live.net/xml.aspx?Appid=9845A4611E3B32B70C2611F531A002E94BF16D7A&sources=web&web.count=1&web.offset=" + attempt + "&query=" + newM;
-		
+		String searchUrl = "http://api.duckduckgo.com/?q=" + newM + "&format=xml";
+		/*BJbjhgfvhgvhgvghvhgvhggcfgcgfcgfc
+		gfcghvgghvhghvjgh
+		*/
 		Document doc = null;
 		try {
 			doc = Jsoup.connect(searchUrl).get();
@@ -117,7 +119,7 @@ public class Site {
 		
 		// we had to use the DOM getElementsByTag thing below (rather than CSS selector)
 		// in order to get around the fact that the namespace in bing result was making it tough to grab the element
-		Elements results = doc.getElementsByTag("web:Url");
+		Elements results = doc.getElementsByTag("AbstractURL");
 		
 		if (results.size() != 0) {
 			Element result = results.get(0);
