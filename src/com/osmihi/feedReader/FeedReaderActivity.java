@@ -53,7 +53,7 @@ public class FeedReaderActivity extends Activity {
 				//"http://www.wikipedia.org/",
 				//"http://www.huffingtonpost.com/",
 				//"http://www.cnn.com/",
-				//"www.lifehacker.com",
+				"www.lifehacker.com",
 				//"msnbc.com/",
 				//"http://news.ycombinator.com",
 		};
