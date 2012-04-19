@@ -2,7 +2,7 @@ package com.osmihi.feedReader;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
+//fkgkfkfkfkfkf
 public class Story {
 	private String title;
 	private String description;
