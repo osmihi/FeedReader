@@ -1,6 +1,4 @@
 package com.osmihi.feedReader;
-//fittle
-// TODO Do we even use jdom??
 
 import java.io.*;
 import java.net.MalformedURLException;
