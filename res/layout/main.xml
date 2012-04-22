@@ -9,6 +9,12 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/hello" />
+
+    <EditText
+        android:id="@+id/site_add_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/default_site" />
 
     <Button
         android:id="@+id/test_app_button"

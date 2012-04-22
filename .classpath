@@ -6,6 +6,10 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="lib" path="lib/android-rome-feed-reader-1.0.0-r2.jar"/>
 	<classpathentry kind="lib" path="lib/jdom-1.1.1-android-fork.jar"/>
-	<classpathentry kind="lib" path="lib/jsoup-1.6.2.jar"/>
+	<classpathentry kind="lib" path="lib/jsoup-1.6.2.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/Othman/Code/libraries/jsoup-1.6.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
