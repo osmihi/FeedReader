@@ -26,6 +26,7 @@ public class Site {
 	
 	private final int MAX_SEARCHES = 6;
 	private final int STORIES_PER_PAGE = 9;
+	private final String BLEKKO_AUTH = "dfc0cc0f";
 	
 	Site(String m) throws FeedNotFoundException {
 		boolean urlOK = false;
@@ -64,28 +65,32 @@ public class Site {
 		} catch (UnsupportedEncodingException e) {
 			// No need to worry since we explicitly provide a valid encoding above
 		} finally {
-			searchUrl = "http://api.duckduckgo.com/?q=" + m + "&format=xml";
+			searchUrl = "http://blekko.com/?q=" + m + "+/rss&auth=" + BLEKKO_AUTH;
 		}
 		
 		try {
-			// Get some search results from DuckDuckGo in XML format
-			Document doc = Jsoup.connect(searchUrl).get();
+			// Get some search results from Blekko
+			SyndFeedInput input = new SyndFeedInput();
+			SyndFeed searchResults = input.build(new XmlReader(new URL(searchUrl)));
+			List<SyndEntryImpl> entries = searchResults.getEntries();		
+			ArrayList<String> hits = new ArrayList<String>();
 			
-			// Locate the tag where the first result's URL is stored
-			//Elements results = doc.getElementsByTag("Results").get(0).getElementsByTag("FirstURL");
-			Elements results = doc.select("results result firstUrl");
-			
-			if (results.size() != 0) {
-				Element result = results.get(0);
-				newUrlStr = result.html();
-			} else {
-				throw new SearchFailException("No results from DuckDuckGo " + searchUrl);
+			for (int i = 0; i < entries.size(); i++) {
+				SyndEntryImpl aHit = (SyndEntryImpl)(entries.get(i));
+
+				hits.add(aHit.getLink());
 			}
+			
+			if (hits.size() != 0) {
+				newUrlStr = hits.get(0);
+			} else {
+				throw new SearchFailException("No results from Blekko " + searchUrl);
+			}
+		} catch (FeedException e) {
+			throw new SearchFailException("Problem connecting to Blekko " + searchUrl);
 		} catch (IOException e) {
-			throw new SearchFailException("Problem connecting to DuckDuckGo " + searchUrl);
-		} /*catch (Exception e) {
-			throw new SearchFailException("Some other search failure on " + searchUrl + "\n" + e.toString());
-		}*/
+			throw new SearchFailException("Problem connecting to Blekko " + searchUrl);
+		}
 		
 		return newUrlStr;
 	}
@@ -185,7 +190,7 @@ public class Site {
 
 class SearchFailException extends Exception {
 	private static final long serialVersionUID = 1L;
-	String msg = "Error performing web search.";
+	String msg = "Unspecified error performing web search.";
 	
 	SearchFailException() {}
 	
