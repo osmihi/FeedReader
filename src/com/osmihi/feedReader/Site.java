@@ -72,19 +72,20 @@ public class Site {
 			Document doc = Jsoup.connect(searchUrl).get();
 			
 			// Locate the tag where the first result's URL is stored
-			Elements results = doc.getElementsByTag("FirstURL");
+			//Elements results = doc.getElementsByTag("Results").get(0).getElementsByTag("FirstURL");
+			Elements results = doc.select("results result firstUrl");
 			
 			if (results.size() != 0) {
 				Element result = results.get(0);
 				newUrlStr = result.html();
 			} else {
-				throw new SearchFailException("No results from DuckDuckGo");
+				throw new SearchFailException("No results from DuckDuckGo " + searchUrl);
 			}
 		} catch (IOException e) {
-			throw new SearchFailException("Problem connecting to DuckDuckGo");
-		} catch (Exception e) {
-			throw new SearchFailException("Some other search failure");
-		}
+			throw new SearchFailException("Problem connecting to DuckDuckGo " + searchUrl);
+		} /*catch (Exception e) {
+			throw new SearchFailException("Some other search failure on " + searchUrl + "\n" + e.toString());
+		}*/
 		
 		return newUrlStr;
 	}
@@ -102,7 +103,7 @@ public class Site {
 			return new URL(theFeed.attr("href"));
 			
 		} catch (IndexOutOfBoundsException e) {
-			throw new FeedNotFoundException("Mysterious ArrayList IndexOutOfBoundsException!");
+			throw new FeedNotFoundException("Mysterious ArrayList IndexOutOfBoundsException at " + mainUrl.toString());
 		} catch (MalformedURLException e) {
 			try {// Second attempt to find a feed link. (just adds rss to end of url)
 				return new URL(mainUrl + "rss");
@@ -119,11 +120,11 @@ public class Site {
 		try {
 			feed = input.build(new XmlReader(feedUrl));
 		} catch (IllegalArgumentException e) {
-			throw new FeedNotFoundException("IllegalArgumentException reading feed");
+			throw new FeedNotFoundException("IllegalArgumentException reading feed " + feedUrl);
 		} catch (FeedException e) {
-			throw new FeedNotFoundException("FeedException reading feed");
+			throw new FeedNotFoundException("FeedException reading feed " + feedUrl);
 		} catch (IOException e) {
-			throw new FeedNotFoundException("IOException reading feed");
+			throw new FeedNotFoundException("IOException reading feed " + feedUrl);
 		}
 	}
 	
