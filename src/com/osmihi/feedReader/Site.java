@@ -32,6 +32,7 @@ public class Site {
 		boolean urlOK = false;
 		
 		while (!urlOK) {
+			// TODO make iterate for if the first, etc findUrl doesn't work?
 			try {
 				mainUrl = new URL(m);
 				urlOK = true;
@@ -43,14 +44,16 @@ public class Site {
 				}
 			}
 		}
-
+		
 		try {
 			feedUrl = findFeed(mainUrl);
 			verifyFeed();
-		} catch (FeedNotFoundException e) {
-			throw e;
+		} catch (IndexOutOfBoundsException e1) {
+			// once we get rid of mysterious arraylist catch inside findFeed, then we'll put stuff here.
+		} catch (FeedNotFoundException e1) {
+			throw e1;
 		}
-
+		
 		// do this later, from outside, esp. not in the constructor
 		//makeStories();
 	}
@@ -77,7 +80,6 @@ public class Site {
 			
 			for (int i = 0; i < entries.size(); i++) {
 				SyndEntryImpl aHit = (SyndEntryImpl)(entries.get(i));
-
 				hits.add(aHit.getLink());
 			}
 			
