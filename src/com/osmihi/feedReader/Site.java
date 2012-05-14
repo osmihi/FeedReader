@@ -21,43 +21,123 @@ import com.google.code.rome.android.repackaged.com.sun.syndication.io.XmlReader;
 public class Site {
 	private URL mainUrl;
 	private URL feedUrl;
+	
+	private MainUrl mu;
+	private FeedUrl fu;
+	
 	private ArrayList<Story> storyList = new ArrayList<Story>();
 	SyndFeed feed = null;
 	
-	private final int MAX_SEARCHES = 6;
-	private final int STORIES_PER_PAGE = 9;
+	// NOTE: Maximum # site / feed searches are found in the classes MainUrl and FeedUrl. Currently hard coded, we should change that.
+	private final int STORIES_PER_PAGE = 9;			// note: should be set with reference to a value stored in an xml file.
 	private final String BLEKKO_AUTH = "dfc0cc0f";
 	
 	Site(String m) throws FeedNotFoundException {
-		boolean urlOK = false;
 		
-		while (!urlOK) {
-			// TODO make iterate for if the first, etc findUrl doesn't work?
+		try {
+			mu = new MainUrl(m);
+		} catch (OverCountException e) {
+			throw new FeedNotFoundException(e.toString());
+		}
+		
+		boolean feedFound = false;
+		
+		while(!feedFound) {
 			try {
-				mainUrl = new URL(m);
-				urlOK = true;
-			} catch (MalformedURLException e) {
+				fu = new FeedUrl(mu.getUrl());
+				feedFound = true;
+			} catch (OverCountException e) {
 				try {
-					m = findUrl(m);
-				} catch (SearchFailException e1) {
-					throw new FeedNotFoundException("Failure during search: " + e1.toString());
+					mu.next();			
+				} catch (OverCountException e1) {
+					throw new FeedNotFoundException(e1.toString());
 				}
 			}
 		}
 		
-		try {
-			feedUrl = findFeed(mainUrl);
-			verifyFeed();
-		} catch (IndexOutOfBoundsException e1) {
-			// once we get rid of mysterious arraylist catch inside findFeed, then we'll put stuff here.
-		} catch (FeedNotFoundException e1) {
-			throw e1;
-		}
-		
-		// do this later, from outside, esp. not in the constructor
-		//makeStories();
 	}
 
+	// INNER CLASSES
+	
+	private interface Cyclable {
+		public void next() throws OverCountException;
+	}
+	
+	private abstract class SiteUrl implements Cyclable {
+		protected URL url;
+		protected int count;
+		protected final int maxCount;
+		
+		SiteUrl(int maxCountNum) throws OverCountException {
+			count = 0;
+			maxCount = maxCountNum; // set maximum number of iterations
+			try {
+				init();
+			} catch (MalformedURLException e) {
+				next();
+			}
+		}
+		
+		public void next() throws OverCountException {
+			count++;
+			if (count <= maxCount) {
+				attempt();
+			} else {throw new OverCountException();}
+		}
+		
+		protected abstract void init() throws MalformedURLException;
+		protected abstract void attempt();
+		
+		public URL getUrl() {return url;}
+		public int getMaxCount() {return maxCount;}
+	}
+	
+	private class MainUrl extends SiteUrl {
+		public MainUrl(String inStr) throws OverCountException {
+			super(5); // init counter and set max number of sites to try for a given search term
+		}
+		
+		protected void init() throws MalformedURLException {}
+		
+		protected void attempt() {}
+
+	}
+	
+	private class FeedUrl extends SiteUrl {
+		public FeedUrl(URL inUrl) throws OverCountException {
+			super(5); // init counter and set max number of feed links to try for a given site 
+		}
+		
+		protected void init() throws MalformedURLException {}
+		
+		protected void attempt() {}
+	}
+	
+	class OverCountException extends Exception {
+		private static final long serialVersionUID = 1L;
+		String msg = "Count exceeded.";
+		
+		OverCountException() {}
+		
+		OverCountException(String u) {msg += " (" + u + ")";}
+		
+		public String toString() {return msg;}
+	}
+	
+	class FeedNotFoundException extends Exception {
+		private static final long serialVersionUID = 1L;
+		String msg = "Error finding feed.";
+		
+		FeedNotFoundException() {}
+		
+		FeedNotFoundException(String u) {msg += " (" + u + ")";}
+		
+		public String toString() {return msg;}
+	}
+	
+	// END INNER CLASSES
+	
+	
 	private String findUrl(String m) throws SearchFailException {
 		String searchUrl = "";
 		String newUrlStr = "";
@@ -201,13 +281,3 @@ class SearchFailException extends Exception {
 	public String toString() {return msg;}
 }
 
-class FeedNotFoundException extends Exception {
-	private static final long serialVersionUID = 1L;
-	String msg = "Error finding feed.";
-	
-	FeedNotFoundException() {}
-	
-	FeedNotFoundException(String u) {msg += " (" + u + ")";}
-	
-	public String toString() {return msg;}
-}
