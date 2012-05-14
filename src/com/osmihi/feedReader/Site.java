@@ -19,14 +19,14 @@ import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedIn
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.XmlReader;
 
 public class Site {
-	private URL mainUrl;
-	private URL feedUrl;
+	private URL mainUrl;	// this will go away
+	private URL feedUrl;	// this will go away
 	
 	private MainUrl mu;
 	private FeedUrl fu;
 	
 	private ArrayList<Story> storyList = new ArrayList<Story>();
-	SyndFeed feed = null;
+	SyndFeed feed = null;	// this seems fishy
 	
 	// NOTE: Maximum # site / feed searches are found in the classes MainUrl and FeedUrl. Currently hard coded, we should change that.
 	private final int STORIES_PER_PAGE = 9;			// note: should be set with reference to a value stored in an xml file.
@@ -57,6 +57,7 @@ public class Site {
 		
 	}
 
+
 	// INNER CLASSES
 	
 	private interface Cyclable {
@@ -71,11 +72,6 @@ public class Site {
 		SiteUrl(int maxCountNum) throws OverCountException {
 			count = 0;
 			maxCount = maxCountNum; // set maximum number of iterations
-			try {
-				init();
-			} catch (MalformedURLException e) {
-				next();
-			}
 		}
 		
 		public void next() throws OverCountException {
@@ -85,7 +81,6 @@ public class Site {
 			} else {throw new OverCountException();}
 		}
 		
-		protected abstract void init() throws MalformedURLException;
 		protected abstract void attempt();
 		
 		public URL getUrl() {return url;}
@@ -93,24 +88,89 @@ public class Site {
 	}
 	
 	private class MainUrl extends SiteUrl {
+		// When created, an instance of this class must either have set its url to a valid Url, or throw an OverCountException.
+		// its public next() method will find try the next search result (and next and next) until a valid url is given.
+		// an instance of this class represents only a valid url that has the potential to host feeds. it doesn't validate anything feed-related!
+		
+		private String possibleUrl;
+		private boolean urlOK = false;
+		//private queue blekko results (stored as strings)
+		
 		public MainUrl(String inStr) throws OverCountException {
 			super(5); // init counter and set max number of sites to try for a given search term
+			possibleUrl = inStr;
+			
+			while (!urlOK) {
+				try {
+					init();
+					urlOK = true;
+				} catch (MalformedURLException e) {
+					next();
+				}
+			}
 		}
 		
-		protected void init() throws MalformedURLException {}
+		protected void init() throws MalformedURLException {
+			url = new URL(possibleUrl);
+		}
 		
-		protected void attempt() {}
+		protected void attempt() {
+			if (count == 0) {
+				// gather blekko results
+			}
+			// set possibleUrl to next blekko result
+		}
 
 	}
 	
 	private class FeedUrl extends SiteUrl {
+		
+		private URL urlToCheck;
+		private boolean urlOK = false;
+		private boolean feedOK = false;
+		private URL possibleFeed;
+		// private queue of possible feeds (stored as strings)
+		
 		public FeedUrl(URL inUrl) throws OverCountException {
-			super(5); // init counter and set max number of feed links to try for a given site 
+			super(5); // init counter and set max number of feed links to try for a given site
+			urlToCheck = inUrl;
+			init();
+			
+			while (!feedOK) {
+				next();
+			}
+			
+
 		}
 		
-		protected void init() throws MalformedURLException {}
+		protected void init() {
+			// parse contents of urlToCheck and create queue of possible feeds 
+		}
 		
-		protected void attempt() {}
+		private void tryUrl() throws MalformedURLException {
+			// ensures that the next feed candidate is a valid URL by creating a new URL object from it
+			// possibleFeed = new URL(queue[count]);
+		}
+		
+		private boolean verifyFeed() {
+			
+			// return true or false depending on if possibleFeed has a valid feed at it.
+			return false; // just placeholder atm so we don't get error warning f/ eclipse.
+		}
+		
+		protected void attempt() {
+			
+			while (!urlOK) {
+				try {
+					tryUrl();
+					urlOK = true;
+				} catch (MalformedURLException e) {}
+			}
+			
+			// ensure that the feed is indeed an actual feed.
+			// feedOK = verifyFeed();
+			
+		}
 	}
 	
 	class OverCountException extends Exception {
@@ -123,152 +183,11 @@ public class Site {
 		
 		public String toString() {return msg;}
 	}
-	
-	class FeedNotFoundException extends Exception {
-		private static final long serialVersionUID = 1L;
-		String msg = "Error finding feed.";
 		
-		FeedNotFoundException() {}
-		
-		FeedNotFoundException(String u) {msg += " (" + u + ")";}
-		
-		public String toString() {return msg;}
-	}
-	
 	// END INNER CLASSES
-	
-	
-	private String findUrl(String m) throws SearchFailException {
-		String searchUrl = "";
-		String newUrlStr = "";
-		
-		// URL encode the string so we can insert it into the search query URL
-		try {
-			m = java.net.URLEncoder.encode(m, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// No need to worry since we explicitly provide a valid encoding above
-		} finally {
-			searchUrl = "http://blekko.com/?q=" + m + "+/rss&auth=" + BLEKKO_AUTH;
-		}
-		
-		try {
-			// Get some search results from Blekko
-			SyndFeedInput input = new SyndFeedInput();
-			SyndFeed searchResults = input.build(new XmlReader(new URL(searchUrl)));
-			List<SyndEntryImpl> entries = searchResults.getEntries();		
-			ArrayList<String> hits = new ArrayList<String>();
-			
-			for (int i = 0; i < entries.size(); i++) {
-				SyndEntryImpl aHit = (SyndEntryImpl)(entries.get(i));
-				hits.add(aHit.getLink());
-			}
-			
-			if (hits.size() != 0) {
-				newUrlStr = hits.get(0);
-			} else {
-				throw new SearchFailException("No results from Blekko " + searchUrl);
-			}
-		} catch (FeedException e) {
-			throw new SearchFailException("Problem connecting to Blekko " + searchUrl);
-		} catch (IOException e) {
-			throw new SearchFailException("Problem connecting to Blekko " + searchUrl);
-		}
-		
-		return newUrlStr;
-	}
-	
-	private URL findFeed(URL mainUrl) throws FeedNotFoundException {
-		try {
-			// Jump through the saved file to find the feed url
-			Document doc = Jsoup.connect(mainUrl.toString()).get();
-			
-			// Search for links that match rss or atom in the type attribute
-			Elements feedLinks = doc.select("link[type*=rss],link[type*=atom]");
-			
-			// TODO Let user choose which RSS to follow? Right now, default to first one.
-			Element theFeed = feedLinks.get(0);
-			return new URL(theFeed.attr("href"));
-			
-		} catch (IndexOutOfBoundsException e) {
-			throw new FeedNotFoundException("Mysterious ArrayList IndexOutOfBoundsException at " + mainUrl.toString());
-		} catch (MalformedURLException e) {
-			try {// Second attempt to find a feed link. (just adds rss to end of url)
-				return new URL(mainUrl + "rss");
-			} catch (MalformedURLException e1) {
-				throw new FeedNotFoundException("Unable to find feed for " + mainUrl.toString());
-			}
-		} catch (IOException e) {
-			throw new FeedNotFoundException("Problem connecting to " + mainUrl.toString());
-		}
-	}
 
-	private void verifyFeed() throws FeedNotFoundException {
-		SyndFeedInput input = new SyndFeedInput();
-		try {
-			feed = input.build(new XmlReader(feedUrl));
-		} catch (IllegalArgumentException e) {
-			throw new FeedNotFoundException("IllegalArgumentException reading feed " + feedUrl);
-		} catch (FeedException e) {
-			throw new FeedNotFoundException("FeedException reading feed " + feedUrl);
-		} catch (IOException e) {
-			throw new FeedNotFoundException("IOException reading feed " + feedUrl);
-		}
-	}
-	
-	private void makeStories() {
-		List<SyndEntryImpl> entries = feed.getEntries();
 
-		for (int i = 0; i < entries.size() && i < STORIES_PER_PAGE; i++) {
-				String aTitle = "";
-				String aDesc = "";
-				String aLink = "";
-				SyndContent aContent = null;
-			
-				SyndEntryImpl aStory = (SyndEntryImpl)(entries.get(i));
-				
-				aTitle = aStory.getTitle();
-				aContent = aStory.getDescription();
-				if (aContent != null) {
-					aDesc = aContent.getValue();
-					// TODO removing tags from description here. Move to elsewhere so we can use info contained in the html in description.
-					aDesc = Jsoup.parse(aDesc).text();
-				}
-				aLink = aStory.getLink();
-				
-				Story storyObj = new Story(aTitle, aDesc, aLink);
-				storyList.add(storyObj);
-		}
-		
-	}
-	
-	public URL getMainUrl() {return mainUrl;}
-	
-	public URL getFeedUrl() {return feedUrl;}
-	
-	public ArrayList<Story> getStoryList() {return storyList;}
-	
-	public String toString() {
-		String outputString = "";
-		
-		outputString += "Main URL: " + mainUrl.toString() + "\n";
-		outputString += "Feed URL: " + feedUrl.toString() + "\n";
-/*		outputString += "Stories: \n";
-		
-		for (int i = 0; i < storyList.size(); i++) {
-			outputString += storyList.get(i).toString() + "\n";
-		}
-*/		return outputString;
-	}
-
-	public static String makeSite(String siteStr) {
-		try {
-			Site aSite = new Site(siteStr);
-			return aSite.toString();
-		} catch (FeedNotFoundException e) {
-			return e.toString();
-		}
-	}	
-}
+}	// END OF SITE CLASS
 
 class SearchFailException extends Exception {
 	private static final long serialVersionUID = 1L;
@@ -281,3 +200,15 @@ class SearchFailException extends Exception {
 	public String toString() {return msg;}
 }
 
+//////////////////////////////////////////////////////////////////
+
+class FeedNotFoundException extends Exception {
+	private static final long serialVersionUID = 1L;
+	String msg = "Error finding feed.";
+	
+	FeedNotFoundException() {}
+	
+	FeedNotFoundException(String u) {msg += " (" + u + ")";}
+	
+	public String toString() {return msg;}
+}
