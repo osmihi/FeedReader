@@ -9,8 +9,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 public class FeedReaderActivity extends Activity {	
-    TextView testAppText;
-    Button testAppButton;
+    TextView labelSearch;
+    Button searchButton;
+    Button clearButton;
     EditText siteAddName;
     
     @Override
@@ -18,20 +19,28 @@ public class FeedReaderActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        testAppText = (TextView)findViewById(R.id.test_app_text);
+        labelSearch = (TextView)findViewById(R.id.labelSearch);
         siteAddName = (EditText)findViewById(R.id.site_add_name);
-        testAppButton = (Button)findViewById(R.id.test_app_button);
+        searchButton = (Button)findViewById(R.id.search_button);
+        clearButton = (Button)findViewById(R.id.clear_button);
 
-        testAppButton.setOnClickListener(new TestButtonListener());
+        searchButton.setOnClickListener(new searchButtonListener());
+        clearButton.setOnClickListener(new clearButtonListener());
     }
     
-    public class TestButtonListener implements OnClickListener {
+    public class searchButtonListener implements OnClickListener {
     	public void onClick(View v) {
     		String siteName = siteAddName.getText().toString();
 
-    		testAppText.setText(testFeed(siteName));
+    		siteAddName.setText(testFeed(siteName));
         }
     }
+    public class clearButtonListener implements OnClickListener {
+    	public void onClick(View v) {
+    		siteAddName.setText("");
+        }
+    }
+
     
 	public static String testFeed(String site) {
 				// ERROR 403 error from IMDB "the walking dead",
