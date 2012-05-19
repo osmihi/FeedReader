@@ -33,7 +33,6 @@ public class Site {
 	private final String BLEKKO_AUTH = "dfc0cc0f";
 	
 	Site(String m) throws FeedNotFoundException {
-		
 		try {
 			mu = new MainUrl(m);
 		} catch (OverCountException e) {
@@ -54,17 +53,15 @@ public class Site {
 				}
 			}
 		}
-		
 	}
-
 
 	// INNER CLASSES
 	
-	private interface Cyclable {
+	private interface Iterable {
 		public void next() throws OverCountException;
 	}
 	
-	private abstract class SiteUrl implements Cyclable {
+	private abstract class SiteUrl implements Iterable {
 		protected URL url;
 		protected int count;
 		protected final int maxCount;
@@ -139,8 +136,6 @@ public class Site {
 			while (!feedOK) {
 				next();
 			}
-			
-
 		}
 		
 		protected void init() {
