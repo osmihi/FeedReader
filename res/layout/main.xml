@@ -19,14 +19,14 @@
         android:text="@string/default_site"
         android:textSize="18sp"
         android:layout_width="fill_parent"
-        android:layout_height="25dp"
+        android:layout_height="50dp"
         android:layout_alignLeft="@+id/labelSearch"
         android:layout_below="@+id/labelSearch"
         android:layout_centerHorizontal="true"
         />
     <Button
         android:id="@+id/search_button"
-        android:layout_width="60dp"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:text="@string/search"
         android:layout_below="@+id/site_add_name"
@@ -35,7 +35,7 @@
     <Button
         android:id="@+id/clear_button"
         android:layout_toLeftOf="@+id/site_add_name"
-        android:layout_width="60dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/clear"
         android:layout_below="@+id/site_add_name"
