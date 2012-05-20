@@ -84,7 +84,7 @@ public class Site {
 	
 	private class MainUrl extends SiteUrl {
 		// When created, an instance of this class must either have set its url to a valid Url, or throw an OverCountException.
-		// its public next() method will find try the next search result (and next and next) until a valid url is given.
+		// its public next() method will try to find the next search result (and next and next) until a valid url is given.
 		// an instance of this class represents only a valid url that has the potential to host feeds. it doesn't validate anything feed-related!
 		
 		private String possibleUrl;
@@ -221,7 +221,7 @@ public class Site {
 		}
 		
 		public SyndFeed getFeed() {return feed;}
-	}
+	} // END FEEDURL CLASS
 	
 	class OverCountException extends Exception {
 		private static final long serialVersionUID = 1L;
