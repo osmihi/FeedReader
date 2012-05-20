@@ -3,6 +3,6 @@
 
     <string name="hello">Hello World, FeedReaderActivity!</string>
     <string name="app_name">FeedReader</string>
-    <string name="default_site">http://www.slashdot.org/</string>
+    <string name="default_site">restaurant reviews</string>
     
 </resources>
