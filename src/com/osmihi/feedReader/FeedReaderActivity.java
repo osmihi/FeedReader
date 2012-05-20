@@ -9,29 +9,38 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 public class FeedReaderActivity extends Activity {	
-    TextView testAppText;
-    Button testAppButton;
-    EditText siteAddName;
-    
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        
-        testAppText = (TextView)findViewById(R.id.test_app_text);
-        siteAddName = (EditText)findViewById(R.id.site_add_name);
-        testAppButton = (Button)findViewById(R.id.test_app_button);
+	   TextView labelSearch;
+	    Button searchButton;
+	    Button clearButton;
+	    EditText siteAddName;
+	    
+	    @Override
+	    public void onCreate(Bundle savedInstanceState) {
+	        super.onCreate(savedInstanceState);
+	        setContentView(R.layout.main);
+	        
+	        labelSearch = (TextView)findViewById(R.id.labelSearch);
+	        siteAddName = (EditText)findViewById(R.id.site_add_name);
+	        searchButton = (Button)findViewById(R.id.search_button);
+	        clearButton = (Button)findViewById(R.id.clear_button);
 
-        testAppButton.setOnClickListener(new TestButtonListener());
-    }
-    
-    public class TestButtonListener implements OnClickListener {
-    	public void onClick(View v) {
-    		String siteName = siteAddName.getText().toString();
-
-    		testAppText.setText(testFeed(siteName));
-        }
-    }
+	        searchButton.setOnClickListener(new searchButtonListener());
+	        clearButton.setOnClickListener(new clearButtonListener());
+	    }
+	    
+	    public class searchButtonListener implements OnClickListener {
+	    	public void onClick(View v) {
+	    		String siteName = siteAddName.getText().toString();
+	    		
+	    		//TODO make a box for the search result or similar
+	    		labelSearch.setText(testFeed(siteName));
+	        }
+	    }
+	    public class clearButtonListener implements OnClickListener {
+	    	public void onClick(View v) {
+	    		siteAddName.setText("");
+	        }
+	    }
     
 	public static String testFeed(String site) {
 				// ERROR 403 error from IMDB "the walking dead",
