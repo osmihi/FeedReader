@@ -12,6 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         />
+
     <EditText
         android:id="@+id/site_add_name"
         android:inputType="text"
@@ -39,5 +40,13 @@
         android:text="@string/clear"
         android:layout_below="@+id/site_add_name"
         android:layout_alignRight="@+id/site_add_name"
+        />
+    <TextView
+        android:id="@+id/resultBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/result_box"
+        android:layout_below="@+id/search_button"
+        android:layout_alignLeft="@+id/search_button"
         />
 </RelativeLayout>

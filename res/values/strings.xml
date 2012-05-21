@@ -10,5 +10,6 @@
     <string name="labelMain">Feed Reader Main Page</string>
     <string name="new_feed">Add New Feed</string>
     <string name="app_info_lbl">Info</string>
+    <string name="result_box">Result</string>
     
 </resources>
