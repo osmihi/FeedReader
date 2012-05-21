@@ -7,5 +7,6 @@
     <string name="searchfeed">Search for Feed</string>
     <string name="clear">Clear</string>
     <string name="search">Search</string>
+    <string name="labelMain">Feed Reader Main Page</string>
     
 </resources>

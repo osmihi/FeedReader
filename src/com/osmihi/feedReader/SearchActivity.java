@@ -8,8 +8,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class FeedReaderActivity extends Activity {	
-	   TextView labelSearch;
+public class SearchActivity extends Activity {	
+	    TextView labelSearch;
 	    Button searchButton;
 	    Button clearButton;
 	    EditText siteAddName;
@@ -17,7 +17,7 @@ public class FeedReaderActivity extends Activity {
 	    @Override
 	    public void onCreate(Bundle savedInstanceState) {
 	        super.onCreate(savedInstanceState);
-	        setContentView(R.layout.main);
+	        setContentView(R.layout.search);
 	        
 	        labelSearch = (TextView)findViewById(R.id.labelSearch);
 	        siteAddName = (EditText)findViewById(R.id.site_add_name);
