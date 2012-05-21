@@ -20,6 +20,7 @@ public class SearchActivity extends Activity {
 	        super.onCreate(savedInstanceState);
 	        setContentView(R.layout.search);
 	        
+	        // perhaps add a ListView as the result box for scalability
 	        resultBox = (TextView)findViewById(R.id.resultBox);
 	        labelSearch = (TextView)findViewById(R.id.labelSearch);
 	        siteAddName = (EditText)findViewById(R.id.site_add_name);
