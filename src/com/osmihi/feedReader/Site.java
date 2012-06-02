@@ -84,7 +84,7 @@ public class Site {
 	
 	private class MainUrl extends SiteUrl {
 		// When created, an instance of this class must either have set its url to a valid Url, or throw an OverCountException.
-		// its public next() method will find try the next search result (and next and next) until a valid url is given.
+		// its public next() method will try to find the next search result (and next and next) until a valid url is given.
 		// an instance of this class represents only a valid url that has the potential to host feeds. it doesn't validate anything feed-related!
 		
 		private String possibleUrl;
@@ -221,20 +221,41 @@ public class Site {
 		}
 		
 		public SyndFeed getFeed() {return feed;}
-	}
+
+	} // END FEEDURL CLASS
 	
-	class OverCountException extends Exception {
-		private static final long serialVersionUID = 1L;
-		String msg = "Count exceeded.";
-		
-		OverCountException() {}
-		
-		OverCountException(String u) {msg += " (" + u + ")";}
-		
-		public String toString() {return msg;}
-	}
-		
-	// END INNER CLASSES
+	private String makeStories() {
+		SyndFeed feed = fu.getFeed();
+		List<SyndEntryImpl> entries = feed.getEntries();
+
+		for (int i = 0; i < entries.size() && i < STORIES_PER_PAGE; i++) {
+				String aTitle = "";
+				String aDesc = "";
+				String aLink = "";
+				SyndContent aContent = null;
+			
+				SyndEntryImpl aStory = (SyndEntryImpl)(entries.get(i));
+				
+				aTitle = aStory.getTitle();
+				aContent = aStory.getDescription();
+				if (aContent != null) {
+					aDesc = aContent.getValue();
+					// TODO removing tags from description here. Move to elsewhere so we can use info contained in the html in description.
+					aDesc = Jsoup.parse(aDesc).text();
+				}
+				aLink = aStory.getLink();
+				
+				Story storyObj = new Story(aTitle, aDesc, aLink);
+				storyList.add(storyObj);
+		}
+		String str = "";
+		for (Story s : storyList) {
+			str += s.toString();
+		}
+		return str;
+	 } // END MAKESTORIES METHOD
+	
+	
 
 	public String getMainUrl() {
 		return mu.getUrl().toString();
@@ -242,12 +263,13 @@ public class Site {
 
 	public String getFeedUrl() {
 		return fu.getUrl().toString();
+		
 	}
 	
 	public String toString() {
 		String str = "";
 		str += "Main URL: " + getMainUrl() + "\n";
-		str += "Feed URL: " + getFeedUrl();
+		str += "Feed URL: " + getFeedUrl() + "\n";
 		return str;
 	}
 	
@@ -259,6 +281,17 @@ public class Site {
 			return e.toString();
 		}
 		
+	}
+	
+	class OverCountException extends Exception {
+		private static final long serialVersionUID = 1L;
+		String msg = "Count exceeded.";
+		
+		OverCountException() {}
+		
+		OverCountException(String u) {msg += " (" + u + ")";}
+		
+		public String toString() {return msg;}
 	}
 	
 }	// END OF SITE CLASS
