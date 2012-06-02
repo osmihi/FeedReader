@@ -8,8 +8,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class FeedReaderActivity extends Activity {	
-	   TextView labelSearch;
+public class SearchActivity extends Activity {	
+	    TextView resultBox;
+		TextView labelSearch;
 	    Button searchButton;
 	    Button clearButton;
 	    EditText siteAddName;
@@ -17,8 +18,10 @@ public class FeedReaderActivity extends Activity {
 	    @Override
 	    public void onCreate(Bundle savedInstanceState) {
 	        super.onCreate(savedInstanceState);
-	        setContentView(R.layout.main);
+	        setContentView(R.layout.search);
 	        
+	        // perhaps add a ListView as the result box for scalability
+	        resultBox = (TextView)findViewById(R.id.resultBox);
 	        labelSearch = (TextView)findViewById(R.id.labelSearch);
 	        siteAddName = (EditText)findViewById(R.id.site_add_name);
 	        searchButton = (Button)findViewById(R.id.search_button);
@@ -33,7 +36,8 @@ public class FeedReaderActivity extends Activity {
 	    		String siteName = siteAddName.getText().toString();
 	    		
 	    		//TODO make a box for the search result or similar
-	    		labelSearch.setText(testFeed(siteName));
+	    		String resultSite = testFeed(siteName);
+	    		resultBox.setText(resultSite);
 	        }
 	    }
 	    public class clearButtonListener implements OnClickListener {
