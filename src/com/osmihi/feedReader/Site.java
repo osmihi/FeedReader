@@ -51,6 +51,8 @@ public class Site {
 				}
 			}
 		}
+		
+		
 	}
 
 	// INNER CLASSES
@@ -144,7 +146,14 @@ public class Site {
 			
 			// Finally, set possibleUrl to next Blekko result
 			if (resultList.size() != 0) {
+				boolean thisUrlOk = false;
+				while (!thisUrlOk) { // TODO potential infinite loop problem?
 				possibleUrl = resultList.get(count);
+					try {
+						init();
+						thisUrlOk = true;
+					} catch (MalformedURLException e) {}
+				}
 			}
 		}
 	}
@@ -179,7 +188,8 @@ public class Site {
 			Document doc = Jsoup.connect(urlToCheck.toString()).get();
 			
 			// Search for links that match rss or atom in the type attribute
-			Elements feedLinks = doc.select("link[type*=rss],link[type*=atom]");
+			//Elements feedLinks = doc.select("link[type*=rss],link[type*=atom]");
+			Elements feedLinks = doc.select("[type*=rss],[href*=rss],[type*=atom],[href=*atom]");
 			
 			for (Element e : feedLinks) {
 				feedList.add(e.attr("href"));
@@ -194,9 +204,7 @@ public class Site {
 			try {
 				possibleFeed = new URL(feedList.get(count));
 				return true;
-			} /*catch (IndexOutOfBoundsException e) {
-				return false;
-			}*/ catch (MalformedURLException e) {
+			} catch (MalformedURLException e) {
 				return false;
 			}
 		}
